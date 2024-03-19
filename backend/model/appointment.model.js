@@ -8,6 +8,10 @@ const Appointment = sequelize.define('appointment', {
         primaryKey: true,
         autoIncrement: true
     },
+    appointmentTime: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     status: {
         type: DataTypes.STRING,
         allowNull: false

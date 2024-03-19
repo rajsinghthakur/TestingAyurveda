@@ -3,6 +3,7 @@ import Doctor from "../model/doctor.model.js";
 import DoctorDetail from "../model/doctordetail.model.js";
 import Appointment from "../model/appointment.model.js";
 import jwt from "jsonwebtoken";
+import User from "../model/user.model.js";
 
 export const SignUp = (request, response, next) => {
     const errors = validationResult(request);
@@ -180,12 +181,72 @@ export const doctorAppointment = (request, response, next) => {
         return response.status(401).json({ error: errors.array() });
 
     Appointment.create({
-        doctorId: request.body.doctorId,
+        status: "pending",
+        appointmentTime: "pending",
         userId: request.body.userId,
-        status: "pendding"
+        doctorId: request.body.doctorId
     })
         .then((result) => {
-            return response.status(200).json({ data: result.dataValues, message: "Appointment created..." });
+            return response.status(200).json({ message: "Appointment Saved...." });
+        })
+        .catch((err) => {
+            return response.status(500).json({ error: "Internal server error...", err });
+        })
+}
+
+export const appointmentList = (request, response, next) => {
+    Appointment.findAll()
+        .then((result) => {
+            return response.status(200).json({ Data: result });
+        })
+        .catch((err) => {
+            return response.status(500).json({ error: "Internal server error...", err });
+        })
+}
+
+export const appointmentDetailslist = (request, response, next) => {
+
+    Appointment.findAll({ include: [{ model: Doctor, required: true }, { model: User, required: true }] })
+        .then((result) => {
+            return response.status(200).json({ Data: result });
+        })
+        .catch((err) => {
+            console.log(err);
+            return response.status(500).json({ error: "Internal server error...", err });
+        })
+}
+
+export const appointmentDetailsperticular = (request, response, next) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty())
+        return response.status(401).json({ error: errors.array() });
+
+    Appointment.findAll({ where: { id: request.body.id }, include: [{ model: Doctor, required: true }, { model: User, required: true }] })
+        .then((result) => {
+            return response.status(200).json({ Data: result });
+        })
+        .catch((err) => {
+            console.log(err);
+            return response.status(500).json({ error: "Internal server error...", err });
+        })
+}
+
+export const updateAppointmentStatus = (request, response, next) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty())
+        return response.status(401).json({ error: errors.array() });
+
+    Appointment.update({
+        status: request.body.status
+    },
+        {
+            where: { id: request.body.id },
+            raw: true
+        })
+        .then((result) => {
+            if (result[0])
+                return response.status(200).json({ message: 'Status updated....' })
+            return response.status(401).json({ message: 'unauthorized request....' })
         })
         .catch((err) => {
             console.log(err);

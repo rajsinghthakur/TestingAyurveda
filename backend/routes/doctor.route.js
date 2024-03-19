@@ -1,7 +1,7 @@
 import express from 'express';
 import { verifyToken } from '../middleware/auth.js';
 import { body } from 'express-validator';
-import { AddDoctorDetail, SignUp, UpdateDoctorDetail, doctorAppointment, doctorProfile, list, remove, signIn, update } from '../controller/doctor.controller.js';
+import { AddDoctorDetail, SignUp, UpdateDoctorDetail, appointmentList, doctorAppointment, doctorProfile, list, remove, signIn, update } from '../controller/doctor.controller.js';
 
 const router = express.Router();
 
@@ -57,5 +57,7 @@ router.put("/updateDoctordetail",
     UpdateDoctorDetail);
 
 router.post("/doctorAppointment", body("userId", "invalid userId").notEmpty(), body("doctorId", "invalid doctorId").notEmpty(), doctorAppointment);
+
+router.get("/appointmentList", appointmentList);
 
 export default router;
